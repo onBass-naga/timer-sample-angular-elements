@@ -1,0 +1,45 @@
+<div class="form" [formGroup]="form">
+  <div>
+    <div>
+      <label>
+        <input type="number"
+               formControlName="duration"
+               #durationField (focus)="durationField.select()"/>
+        <select formControlName="unit">
+          <option *ngFor="let option of UnitOptions"
+                  [value]="option.value"
+                  [selected]="option.value === selectedUnitValue">{{option.label}}</option>
+        </select>
+      </label>
+      <ng-container *ngIf="selectedUnitValue === UnitFrameValue && duration">
+        （{{duration.seconds | decimal}}秒）
+      </ng-container>
+    </div>
+  </div>
+</div>
+<hr>
+<div class="controller">
+  <div class="header">
+    <ng-container *ngIf="timer">
+      <div>
+        終了予定時刻:
+        <ng-container *ngIf="nowCounting; then showSchedule; else hideSchedule">
+        </ng-container>
+        <ng-template #showSchedule>{{timer.timeScheduled | date:"HH:mm"}}</ng-template>
+        <ng-template #hideSchedule> ---</ng-template>
+      </div>
+    </ng-container>
+  </div>
+  <div class="body">
+    <span class="text_xxLarge">{{countSec}}</span>
+  </div>
+  <div class="footer">
+    <button [disabled]="!form.valid || nowCounting"
+            (click)="startCountdown()"
+            #startButton>Start
+    </button>
+    <button [disabled]="!nowCounting"
+            (click)="pause()">Stop
+    </button>
+  </div>
+</div>
