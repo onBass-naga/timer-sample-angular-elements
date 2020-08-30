@@ -1,19 +1,17 @@
-import {Component, OnInit, ViewChild} from '@angular/core';
-import {FormBuilder, Validators} from '@angular/forms';
+import {Component, OnDestroy, OnInit, ViewChild} from '@angular/core';
+import {FormBuilder, FormControl, Validators} from '@angular/forms';
 import {beep1, beep2, beep3} from './audio/beep';
 import {Units} from './domain/unit';
 import {Duration} from './domain/duration';
 import {Timer} from './domain/timer';
 import {fromEvent} from 'rxjs';
 
-const OneSecond = 1000;
-
 @Component({
   selector: 'app-timer',
   templateUrl: './timer.component.html',
   styleUrls: ['./timer.component.scss']
 })
-export class TimerComponent implements OnInit {
+export class TimerComponent implements OnInit, OnDestroy {
 
   @ViewChild('startButton')
   public startButtonElement;
@@ -21,9 +19,12 @@ export class TimerComponent implements OnInit {
   UnitOptions = Units.Options;
   UnitFrameValue = Units.Frame.value;
 
+  soundOnControl = new FormControl(true);
+
   form = this.fb.group({
-    duration: [0, Validators.min(1)],
-    unit: [Units.Frame.value]
+    duration: [0, [Validators.required, Validators.min(1)]],
+    unit: [Units.Second.value],
+    soundControl: this.soundOnControl,
   });
 
   duration: Duration | undefined;
@@ -48,6 +49,10 @@ export class TimerComponent implements OnInit {
     return parseInt(value, 10);
   }
 
+  get soundOn(): boolean {
+    return this.soundOnControl.value;
+  }
+
   ngOnInit(): void {
     this.form.get('duration').valueChanges.subscribe(value => {
       this.duration = Duration.of(value, Units.of(this.selectedUnitValue));
@@ -60,10 +65,14 @@ export class TimerComponent implements OnInit {
 
     fromEvent(document, 'keydown')
       .subscribe((e: KeyboardEvent) => {
-        if (e.code === 'Space') {
+        if (e.code === 'Space' && !this.nowCounting) {
           this.startButtonElement.nativeElement.click();
         }
       });
+  }
+
+  ngOnDestroy(): void {
+    clearInterval(this.timerInterval);
   }
 
   initializeCountSec(): void {
@@ -73,16 +82,18 @@ export class TimerComponent implements OnInit {
   startCountdown(): void {
 
     this.initializeCountSec();
-    this.timer = new Timer(() => new Date(), this.duration);
+    this.timer = new Timer(() => new Date(), this.duration, this.soundOn);
 
     setTimeout(() => {
       this.timerInterval = setInterval(() => {
         this.updateCountSec();
         this.stopCountIfEnded();
-      }, OneSecond);
+      }, 1000);
     }, this.timer.durationBeforeCountMSec);
 
-    beep1();
+    if (this.soundOn) {
+      beep1();
+    }
     this.nowCounting = true;
   }
 
@@ -93,18 +104,13 @@ export class TimerComponent implements OnInit {
 
   stopCountIfEnded(): void {
     if (this.countSec === 0) {
-      this.pause();
+      setTimeout(() => this.pause(), 1500);
     }
   }
 
   pause(): void {
-    this.nowCounting = false;
     clearInterval(this.timerInterval);
+    this.nowCounting = false;
   }
 
-  clear(): void {
-    this.nowCounting = false;
-    clearInterval(this.timerInterval);
-    this.countSec = 0;
-  }
 }

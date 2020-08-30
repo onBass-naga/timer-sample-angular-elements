@@ -11,7 +11,8 @@ export class Timer {
 
   constructor(
     private dateFactoryFn: DateFactoryFn,
-    private duration: Duration
+    private duration: Duration,
+    private soundOn: boolean,
   ) {
     this.needAlarm = this.duration.seconds.greaterThanOrEqualTo(90);
     const now = this.dateFactoryFn();
@@ -29,6 +30,10 @@ export class Timer {
   }
 
   beepIfNeed(countdownBeepFn: BeepFn, doneBeepFn: BeepFn, reminderBeepFn: BeepFn): void {
+
+    if (!this.soundOn) {
+      return;
+    }
 
     if (this.countSec === 0) {
       doneBeepFn();

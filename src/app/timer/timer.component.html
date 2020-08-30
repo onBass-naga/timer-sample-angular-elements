@@ -1,45 +1,90 @@
-<div class="form" [formGroup]="form">
-  <div>
-    <div>
-      <label>
-        <input type="number"
-               formControlName="duration"
-               #durationField (focus)="durationField.select()"/>
-        <select formControlName="unit">
-          <option *ngFor="let option of UnitOptions"
-                  [value]="option.value"
-                  [selected]="option.value === selectedUnitValue">{{option.label}}</option>
-        </select>
-      </label>
-      <ng-container *ngIf="selectedUnitValue === UnitFrameValue && duration">
-        （{{duration.seconds | decimal}}秒）
-      </ng-container>
-    </div>
-  </div>
-</div>
-<hr>
-<div class="controller">
-  <div class="header">
-    <ng-container *ngIf="timer">
-      <div>
-        終了予定時刻:
-        <ng-container *ngIf="nowCounting; then showSchedule; else hideSchedule">
-        </ng-container>
-        <ng-template #showSchedule>{{timer.timeScheduled | date:"HH:mm"}}</ng-template>
-        <ng-template #hideSchedule> ---</ng-template>
+<div class="container">
+  <mat-tab-group mat-align-tabs="center">
+    <mat-tab label="タイマー">
+      <div class="contentWrapper">
+        <div class="form" [formGroup]="form">
+          <mat-form-field appearance="outline" class="input_wrapper">
+            <mat-label>待機時間</mat-label>
+            <div class="input_group">
+              <input type="number"
+                     class="input_duration"
+                     formControlName="duration"
+                     [readonly]="nowCounting"
+                     #durationField
+                     matInput
+                     (focus)="durationField.select()"/>
+              <mat-select formControlName="unit" class="input_unit">
+                <mat-option *ngFor="let option of UnitOptions"
+                            [value]="option.value"
+                            [disabled]="nowCounting">
+                  {{option.label}}
+                </mat-option>
+              </mat-select>
+            </div>
+            <mat-hint align="end"
+                      *ngIf="selectedUnitValue === UnitFrameValue && duration">
+              {{duration.seconds | decimal}}秒
+            </mat-hint>
+          </mat-form-field>
+        </div>
+        <div class="controller">
+          <ng-container *ngIf="nowCounting; then showTimer; else hideTimer"></ng-container>
+          <ng-template #showTimer>
+            <div class="display">
+              <div class="counterWrapper">
+                <div class="counter">{{countSec}}</div>
+              </div>
+              <div class="scheduledTime">
+                <mat-icon class="icon" *ngIf="soundOn">alarm_on</mat-icon>
+                <mat-icon class="icon" *ngIf="!soundOn">alarm_off</mat-icon>
+                <span class="time">{{timer.timeScheduled | date:"HH:mm"}}</span>
+              </div>
+              <div class="indicatorWrapper">
+                <app-indicator [count]="countSec"></app-indicator>
+              </div>
+            </div>
+
+            <div class="controller_footer">
+              <button *ngIf="nowCounting"
+                      [disabled]="!nowCounting"
+                      (click)="pause()"
+                      class="button"
+                      mat-raised-button><span>Stop</span>
+              </button>
+            </div>
+          </ng-template>
+          <ng-template #hideTimer>
+            <div class="display">
+              <div class="alarmImageWrapper">
+                <mat-icon class="alarmImage">alarm</mat-icon>
+              </div>
+            </div>
+            <div class="controller_footer">
+              <button *ngIf="!nowCounting"
+                      [disabled]="!form.valid || nowCounting"
+                      (click)="startCountdown()"
+                      class="button"
+                      color="primary"
+                      mat-raised-button><span #startButton>Start</span>
+              </button>
+            </div>
+          </ng-template>
+        </div>
       </div>
-    </ng-container>
-  </div>
-  <div class="body">
-    <span class="text_xxLarge">{{countSec}}</span>
-  </div>
-  <div class="footer">
-    <button [disabled]="!form.valid || nowCounting"
-            (click)="startCountdown()"
-            #startButton>Start
-    </button>
-    <button [disabled]="!nowCounting"
-            (click)="pause()">Stop
-    </button>
-  </div>
+    </mat-tab>
+    <mat-tab label="設定">
+      <div class="contentWrapper">
+        <div class="form" [formGroup]="form">
+          <section class="preferences">
+            <mat-slide-toggle
+              class="example-margin"
+              color="primary"
+              [formControl]="soundOnControl">
+              音を鳴らす
+            </mat-slide-toggle>
+          </section>
+        </div>
+      </div>
+    </mat-tab>
+  </mat-tab-group>
 </div>

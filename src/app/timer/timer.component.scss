@@ -1,4 +1,98 @@
 
+.contentWrapper {
+  padding-top: 16px;
+  min-height: 274px;
+}
+
 .text_xxLarge {
   font-size: xx-large;
+}
+
+.input_wrapper {
+  width: 100%;
+}
+
+.input_group {
+  display: flex;
+  justify-content: space-between;
+}
+
+.input_duration {
+  padding-right: 24px;
+  flex-basis: auto;
+  text-align: right;
+}
+
+.input_unit {
+  flex-basis: 80px;
+}
+
+.controller {
+  min-height: 120px;
+}
+
+.display {
+  min-height: 160px;
+  text-align: center;
+}
+
+.controller_footer {
+  text-align: center;
+}
+
+.button {
+  width: 80%
+}
+
+.counterWrapper {
+  margin: 0 8px 8px 8px;
+  height: 80px;
+  display: flex;
+}
+
+.counter {
+  font-size: 5em;
+  margin: auto;
+}
+
+.scheduledTime {
+  font-size: 1.2em;
+  color: #673ab7;
+  vertical-align: middle;
+}
+
+.time {
+  display: inline-flex;
+  vertical-align: middle;
+}
+
+.icon {
+  display: inline-flex;
+  vertical-align: middle;
+
+  font-size: inherit;
+  height: inherit;
+  width: inherit;
+}
+
+.indicatorWrapper {
+  width: 100%;
+  margin: 8px auto;
+}
+
+.alarmImageWrapper {
+  padding-top: 16px;
+}
+
+.alarmImage {
+  font-size: 7em;
+  color: #ccc;
+
+  height: inherit;
+  width: inherit;
+  margin: auto;
+}
+
+.preferences {
+  padding: 8px 16px;
 }
