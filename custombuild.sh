@@ -4,4 +4,4 @@ ng build timer --prod --output-hashing=none && cat \
   dist/timer/polyfills.js \
   dist/timer/scripts.js \
   dist/timer/main.js \
-  > preview/timer.js
+  > docs/timer.js
