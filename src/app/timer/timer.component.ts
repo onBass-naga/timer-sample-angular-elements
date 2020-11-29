@@ -20,6 +20,7 @@ export class TimerComponent implements OnInit, OnDestroy {
   UnitFrameValue = Units.Frame.value;
 
   soundOnControl = new FormControl(true);
+  diffControl = new FormControl(0, Validators.required);
 
   form = this.fb.group({
     duration: [0, [Validators.required, Validators.min(1)]],
@@ -32,7 +33,7 @@ export class TimerComponent implements OnInit, OnDestroy {
 
   countSec = 0;
   nowCounting = false;
-  timerInterval = -1;
+  timerIntervals = [];
 
   constructor(
     private fb: FormBuilder,
@@ -41,7 +42,7 @@ export class TimerComponent implements OnInit, OnDestroy {
 
   get durationInputValue(): number {
     const value = this.form.get('duration').value;
-    return parseInt(value, 10);
+    return Number.parseFloat(value);
   }
 
   get selectedUnitValue(): number {
@@ -51,6 +52,10 @@ export class TimerComponent implements OnInit, OnDestroy {
 
   get soundOn(): boolean {
     return this.soundOnControl.value;
+  }
+
+  get diffMSec(): number {
+    return this.diffControl.value * 1000;
   }
 
   ngOnInit(): void {
@@ -72,7 +77,13 @@ export class TimerComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    clearInterval(this.timerInterval);
+    this.clearAllIntervals();
+  }
+
+  private clearAllIntervals(): void {
+    this.timerIntervals.forEach(interval => {
+      clearInterval(interval);
+    });
   }
 
   initializeCountSec(): void {
@@ -85,11 +96,12 @@ export class TimerComponent implements OnInit, OnDestroy {
     this.timer = new Timer(() => new Date(), this.duration, this.soundOn);
 
     setTimeout(() => {
-      this.timerInterval = setInterval(() => {
+      const timerInterval = setInterval(() => {
         this.updateCountSec();
         this.stopCountIfEnded();
       }, 1000);
-    }, this.timer.durationBeforeCountMSec);
+      this.timerIntervals.push(timerInterval);
+    }, this.timer.durationBeforeCountMSec + this.diffMSec);
 
     if (this.soundOn) {
       beep1();
@@ -109,7 +121,7 @@ export class TimerComponent implements OnInit, OnDestroy {
   }
 
   pause(): void {
-    clearInterval(this.timerInterval);
+    this.clearAllIntervals();
     this.nowCounting = false;
   }
 

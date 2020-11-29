@@ -82,6 +82,19 @@
               [formControl]="soundOnControl">
               音を鳴らす
             </mat-slide-toggle>
+            <mat-form-field appearance="outline" class="diffWrapper">
+              <mat-label>ズレ補正</mat-label>
+              <div class="input_group">
+                <input type="number"
+                       class="input_duration"
+                       [formControl]="diffControl"
+                       [readonly]="nowCounting"
+                       #diffField
+                       matInput
+                       (focus)="diffField.select()"/>
+                <span matSuffix>秒</span>
+              </div>
+            </mat-form-field>
           </section>
         </div>
       </div>
